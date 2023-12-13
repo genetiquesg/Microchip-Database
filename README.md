@@ -1,2 +1,3 @@
 # Microchip-Database
-Creation of a Pet microchip that will be use worldwide
+Creation of a Pet microchip for Singapore that will be linked to other pet database such as https://www.pettrac.co.uk/
+and https://www.petlog.org.uk/
