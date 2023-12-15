@@ -17,7 +17,7 @@ cache = Cache(app, config={
 })
 
 # Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
+logging.basicConfig(filename='chip_submissions.log', level=logging.INFO, format='%(asctime)s %(message)s')
 
 # HTML template for the form and the result
 HTML_TEMPLATE = '''
