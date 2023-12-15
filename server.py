@@ -142,7 +142,11 @@ def check_chip():
 
         # Log the chip submission
         logging.info(f"Chip checked: {chip_number}")
-
+        # Genetique Cat Checking Microchip https://genetiquebengals.com/
+        if chip_number.startswith('702'):
+            homepage_url = "https://pals.avs.gov.sg/"
+            return render_template_string(HTML_TEMPLATE, homepage_url=homepage_url)
+            
         # Check if result is in cache
         cached_url = cache.get(chip_number)
         if cached_url is not None:
