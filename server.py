@@ -6,8 +6,15 @@ import json
 
 app = Flask(__name__)
 
+long_timeout = 60 * 60 * 24 * 365 * 10  # 10 years in seconds
+
 # Configure cache
-cache = Cache(app, config={'CACHE_TYPE': 'simple'})
+# cache = Cache(app, config={'CACHE_TYPE': 'simple'})
+cache = Cache(app, config={
+    'CACHE_TYPE': 'filesystem',
+    'CACHE_DIR': './cache',  # Path to the cache directory
+    'CACHE_DEFAULT_TIMEOUT': None  # Optional: default cache timeout in seconds
+})
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
@@ -159,7 +166,7 @@ def check_chip():
         else:
             homepage_url = 'Error: Could not retrieve data'
 
-        cache.set(chip_number, homepage_url, timeout=None)
+        cache.set(chip_number, homepage_url, timeout=long_timeout)
 
     return render_template_string(HTML_TEMPLATE, homepage_url=homepage_url)
 
