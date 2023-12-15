@@ -10,8 +10,7 @@ app = Flask(__name__)
 cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 
 # Configure logging
-logging.basicConfig(filename='chip_submissions.log',
-                    level=logging.INFO, format='%(asctime)s %(message)s')
+logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
 
 # HTML template for the form and the result
 HTML_TEMPLATE = '''
