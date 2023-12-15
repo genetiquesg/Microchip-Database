@@ -146,7 +146,8 @@ HTML_TEMPLATE = '''
 </html>
 '''
 def log_with_ip(message):
-    ip_address = request.remote_addr
+    #ip_address = request.remote_addr
+    ip_address = request.headers.get('X-Forwarded-For', request.remote_addr)
     user_agent = request.headers.get('User-Agent', 'Unknown')
     chip_logger.info(f"{ip_address} - {user_agent} - {message}")
 
