@@ -2,7 +2,7 @@ from flask import Flask, request, render_template_string
 from flask_caching import Cache
 import requests
 import logging
-import json
+from logging.handlers import RotatingFileHandler
 
 app = Flask(__name__)
 
@@ -16,8 +16,21 @@ cache = Cache(app, config={
     'CACHE_DEFAULT_TIMEOUT': None  # Optional: default cache timeout in seconds
 })
 
-# Configure logging
-logging.basicConfig(filename='chip_submissions.log', level=logging.INFO, format='%(asctime)s %(message)s')
+# Set up a specific logger with our desired output level
+chip_logger = logging.getLogger('ChipLogger')
+chip_logger.setLevel(logging.INFO)
+
+# Create the RotatingFileHandler
+handler = RotatingFileHandler(
+    'chip_submissions.log', maxBytes=10000, backupCount=1)
+handler.setLevel(logging.INFO)
+
+# Create formatter and add it to the handler
+formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
+
+# Add the handler to the logger
+chip_logger.addHandler(handler)
 
 # HTML template for the form and the result
 HTML_TEMPLATE = '''
@@ -132,7 +145,10 @@ HTML_TEMPLATE = '''
 </body>
 </html>
 '''
-
+def log_with_ip(message):
+    ip_address = request.remote_addr
+    user_agent = request.headers.get('User-Agent', 'Unknown')
+    chip_logger.info(f"{ip_address} - {user_agent} - {message}")
 
 @app.route('/', methods=['GET', 'POST'])
 def check_chip():
@@ -141,7 +157,7 @@ def check_chip():
         chip_number = request.form['chip_number']
 
         # Log the chip submission
-        logging.info(f"Chip checked: {chip_number}")
+        log_with_ip(f"Chip checked: {chip_number}")
         # Genetique Cat Checking Microchip https://genetiquebengals.com/
         if chip_number.startswith('702'):
             homepage_url = "https://pals.avs.gov.sg/"
