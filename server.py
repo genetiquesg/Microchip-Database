@@ -25,14 +25,16 @@ class TelegramLoggingHandler(logging.Handler):
     def __init__(self, token, chat_id):
         super().__init__()
         self.chat_id = chat_id
-        self.bot = Bot(token)
+        self.token = token
 
     def emit(self, record):
         log_entry = self.format(record)
-        asyncio.run(self.async_send(log_entry))
-
-    async def async_send(self, message):
-        await self.bot.send_message(chat_id=self.chat_id, text=message)
+        url = f"https://api.telegram.org/bot{self.token}/sendMessage"
+        data = {
+            "chat_id": self.chat_id,
+            "text": log_entry
+        }
+        requests.post(url, data=data)
 
 
 # Telegram bot token and chat ID
