@@ -3,6 +3,10 @@ from flask_caching import Cache
 import requests
 import logging
 from logging.handlers import RotatingFileHandler
+from telegram import Bot
+from telegram.ext import Updater
+import os
+import asyncio
 
 app = Flask(__name__)
 
@@ -16,21 +20,36 @@ cache = Cache(app, config={
     'CACHE_DEFAULT_TIMEOUT': None  # Optional: default cache timeout in seconds
 })
 
+
+class TelegramLoggingHandler(logging.Handler):
+    def __init__(self, token, chat_id):
+        super().__init__()
+        self.chat_id = chat_id
+        self.bot = Bot(token)
+
+    def emit(self, record):
+        log_entry = self.format(record)
+        asyncio.run(self.async_send(log_entry))
+
+    async def async_send(self, message):
+        await self.bot.send_message(chat_id=self.chat_id, text=message)
+
+
+# Telegram bot token and chat ID
+TELEGRAM_TOKEN = os.getenv('telegram_token')
+TELEGRAM_CHAT_ID = os.getenv('telegram_chat_id')
+
+# Set up the Telegram logging handler
+telegram_handler = TelegramLoggingHandler(TELEGRAM_TOKEN, TELEGRAM_CHAT_ID)
+telegram_handler.setLevel(logging.INFO)
+formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+telegram_handler.setFormatter(formatter)
+
 # Set up a specific logger with our desired output level
 chip_logger = logging.getLogger('ChipLogger')
 chip_logger.setLevel(logging.INFO)
+chip_logger.addHandler(telegram_handler)
 
-# Create the RotatingFileHandler
-handler = RotatingFileHandler(
-    'chip_submissions.log', maxBytes=10000, backupCount=1)
-handler.setLevel(logging.INFO)
-
-# Create formatter and add it to the handler
-formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-handler.setFormatter(formatter)
-
-# Add the handler to the logger
-chip_logger.addHandler(handler)
 
 # HTML template for the form and the result
 HTML_TEMPLATE = '''
@@ -145,11 +164,14 @@ HTML_TEMPLATE = '''
 </body>
 </html>
 '''
+
+
 def log_with_ip(message):
-    #ip_address = request.remote_addr
+    # ip_address = request.remote_addr
     ip_address = request.headers.get('X-Forwarded-For', request.remote_addr)
     user_agent = request.headers.get('User-Agent', 'Unknown')
     chip_logger.info(f"{ip_address} - {user_agent} - {message}")
+
 
 @app.route('/', methods=['GET', 'POST'])
 def check_chip():
@@ -163,7 +185,7 @@ def check_chip():
         if chip_number.startswith('702'):
             homepage_url = "https://pals.avs.gov.sg/"
             return render_template_string(HTML_TEMPLATE, homepage_url=homepage_url)
-            
+
         # Check if result is in cache
         cached_url = cache.get(chip_number)
         if cached_url is not None:
