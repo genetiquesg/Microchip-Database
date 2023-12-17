@@ -20,6 +20,61 @@ cache = Cache(app, config={
     'CACHE_DEFAULT_TIMEOUT': None  # Optional: default cache timeout in seconds
 })
 
+country_codes = {
+    "32": "Argentina",
+    "36": "Australia",
+    "40": "Austria",
+    "44": "Bahamas",
+    "52": "Barbados",
+    "56": "Belgium",
+    "60": "Bermuda",
+    "76": "Brazil",
+    "124": "Canada",
+    "152": "Chile",
+    "156": "China",
+    "158": "Taiwan",
+    "203": "CzechRepublic",
+    "208": "Denmark",
+    "214": "DominicanRepublic",
+    "246": "Finland",
+    "250": "France",
+    "276": "Germany",
+    "300": "Greece",
+    "348": "Hungary",
+    "356": "India",
+    "360": "Indonesia",
+    "372": "Ireland",
+    "376": "Israel",
+    "380": "Italy",
+    "392": "Japan",
+    "442": "Luxembourg",
+    "458": "Malaysia",
+    "484": "Mexico",
+    "492": "Monaco",
+    "528": "Netherlands",
+    "554": "NewZealand",
+    "578": "Norway",
+    "604": "Peru",
+    "608": "Philippines",
+    "616": "Poland",
+    "620": "Portugal",
+    "630": "PuertoRico",
+    "642": "Romania",
+    "643": "RussianFederation",
+    "702": "https://pals.avs.gov.sg/",
+    "710": "SouthAfrica",
+    "724": "Spain",
+    "752": "Sweden",
+    "756": "Switzerland",
+    "764": "Thailand",
+    "792": "Turkey",
+    "804": "Ukraine",
+    "818": "Egypt",
+    "840": "UnitedStates",
+    "858": "Uruguay",
+    "862": "Venezuela",
+    "891": "Yugoslavia"
+}
 
 class TelegramLoggingHandler(logging.Handler):
     def __init__(self, token, chat_id):
@@ -184,9 +239,11 @@ def check_chip():
         # Log the chip submission
         log_with_ip(f"Chip checked: {chip_number}")
         # Genetique Cat Checking Microchip https://genetiquebengals.com/
-        if chip_number.startswith('702'):
-            homepage_url = "https://pals.avs.gov.sg/"
-            return render_template_string(HTML_TEMPLATE, homepage_url=homepage_url)
+        
+        for code, country in country_codes.items():
+            if chip_number.startswith(code):
+                homepage_url = f"{country.lower()}"
+                return render_template_string(HTML_TEMPLATE, homepage_url=homepage_url)
 
         # Check if result is in cache
         cached_url = cache.get(chip_number)
