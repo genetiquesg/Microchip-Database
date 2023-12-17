@@ -1,3 +1,2 @@
 # Microchip-Database
-Creation of a Pet microchip for Singapore that will be linked to other pet database such as https://www.pettrac.co.uk/
-and https://www.petlog.org.uk/
+Creation of a Pet microchip lookup service for Singapore at https://genetiquebengals.com/free-microchip-lookup
