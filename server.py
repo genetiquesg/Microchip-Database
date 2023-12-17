@@ -196,7 +196,7 @@ HTML_TEMPLATE = '''
         <p>Please wait for 1-2 minutes...</p>
     </div>
     {% if homepage_url %}
-        <p style="font-size: 18px;">Microchip registered at : <a href="{{ homepage_url }}" style="color: #009688;">{{ homepage_url }}</a></p>
+        <p style="font-size: 18px;">Microchip registered at : {{ homepage_url }}</p>
     {% elif homepage_url == '' %}
         <p style="font-size: 18px;">No microchip found.</p>
     {% endif %}
