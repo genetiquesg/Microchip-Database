@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template_string
+from flask import Flask, request, render_template_string, Response
 from flask_caching import Cache
 import requests
 import logging
@@ -187,7 +187,7 @@ HTML_TEMPLATE = '''
 <body>
     <h2>Enter MicroChip Number</h2>
     <form method="POST" id="chipForm">
-        <input type="text" name="chip_number" pattern="\\d{15}" required title="15 digit number required">
+        <input type="text" name="chip_number" pattern="\\d{9}|\\d{10}|\\d{15}" required title="9, 10, or 15 digit number required">
         <input type="submit" value="Submit">
         <button type="button" onclick="clearInput()">Clear</button>
     </form>
@@ -243,12 +243,17 @@ def check_chip():
         for code, country in country_codes.items():
             if chip_number.startswith(code):
                 homepage_url = f"{country.lower()}"
-                return render_template_string(HTML_TEMPLATE, homepage_url=homepage_url)
+                # Create a response object with CSP header
+                response = Response(render_template_string(HTML_TEMPLATE, homepage_url=homepage_url))
+                response.headers['Content-Security-Policy'] = "frame-ancestors 'self' https://genetiquebengals.com"
+                return response
 
         # Check if result is in cache
         cached_url = cache.get(chip_number)
         if cached_url is not None:
-            return render_template_string(HTML_TEMPLATE, homepage_url=cached_url)
+            response = Response(render_template_string(HTML_TEMPLATE, homepage_url=cached_url))
+            response.headers['Content-Security-Policy'] = "frame-ancestors 'self' https://genetiquebengals.com"
+            return response
 
         # Construct the URL with the chip number
         url = f"https://identibase-api-live.azurewebsites.net/api/chips/checkchip/{chip_number}"
@@ -270,7 +275,12 @@ def check_chip():
 
         cache.set(chip_number, homepage_url, timeout=long_timeout)
 
-    return render_template_string(HTML_TEMPLATE, homepage_url=homepage_url)
+    response = Response(render_template_string(HTML_TEMPLATE, homepage_url=homepage_url))
+
+    # Set the Content Security Policy header to allow framing only by genetiquebengals.com
+    response.headers['Content-Security-Policy'] = "frame-ancestors 'self' https://genetiquebengals.com"
+
+    return response
 
 
 if __name__ == '__main__':
