@@ -73,7 +73,8 @@ country_codes = {
     "840": "UnitedStates",
     "858": "Uruguay",
     "862": "Venezuela",
-    "891": "Yugoslavia"
+    "891": "Yugoslavia",
+    "900": "International Microchip"
 }
 
 class TelegramLoggingHandler(logging.Handler):
