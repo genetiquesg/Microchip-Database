@@ -246,14 +246,14 @@ def check_chip():
                 homepage_url = f"{country.lower()}"
                 # Create a response object with CSP header
                 response = Response(render_template_string(HTML_TEMPLATE, homepage_url=homepage_url))
-                response.headers['Content-Security-Policy'] = "frame-ancestors 'self' https://genetiquebengals.com"
+                response.headers['Content-Security-Policy'] = "frame-ancestors 'self' https://genetiquecats.sg"
                 return response
 
         # Check if result is in cache
         cached_url = cache.get(chip_number)
         if cached_url is not None:
             response = Response(render_template_string(HTML_TEMPLATE, homepage_url=cached_url))
-            response.headers['Content-Security-Policy'] = "frame-ancestors 'self' https://genetiquebengals.com"
+            response.headers['Content-Security-Policy'] = "frame-ancestors 'self' https://genetiquecats.sg"
             return response
 
         # Construct the URL with the chip number
@@ -279,7 +279,7 @@ def check_chip():
     response = Response(render_template_string(HTML_TEMPLATE, homepage_url=homepage_url))
 
     # Set the Content Security Policy header to allow framing only by genetiquebengals.com
-    response.headers['Content-Security-Policy'] = "frame-ancestors 'self' https://genetiquebengals.com"
+    response.headers['Content-Security-Policy'] = "frame-ancestors 'self' https://genetiquecats.sg"
 
     return response
 
